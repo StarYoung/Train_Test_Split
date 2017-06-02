@@ -1,18 +1,18 @@
 #-*- coding:utf-8-*-
 import codecs
 import sys
-
-
-import numpy as np
-from sklearn.cross_validation import train_test_split
-import re
-
 reload(sys)
 
 default_encoding='utf-8'
 if sys.getdefaultencoding() != default_encoding:
     reload(sys)
     sys.setdefaultencoding(default_encoding)
+
+import numpy as np
+from sklearn.cross_validation import train_test_split
+import re
+
+
 
 
 
