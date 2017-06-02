@@ -1,0 +1,67 @@
+#-*- coding:utf-8-*-
+import codecs
+import sys
+
+
+import numpy as np
+from sklearn.cross_validation import train_test_split
+import re
+
+reload(sys)
+
+default_encoding='utf-8'
+if sys.getdefaultencoding() != default_encoding:
+    reload(sys)
+    sys.setdefaultencoding(default_encoding)
+
+
+
+pattern = re.compile('[a-z][a-z]+[1234]')
+
+
+source = open('/home/hadoop/Desktop/2.txt')
+dataTest = codecs.open('/home/hadoop/Desktop/data.txt','w','utf-8')
+labelTest = open('/home/hadoop/Desktop/label.txt','w')
+data=[]
+label=[]
+labelSet=set()
+
+# build data[] and label[]
+for line in source:
+    # line = line.decode('gbk')
+
+    y = re.findall(pattern,line)
+    print y
+    y=set(y)
+    print y
+    for sub in y:
+        label.append(sub)
+        data.append(line)
+    # label里的y的格式都是list
+
+# print len(data)
+# print len(label)
+
+for index1,l in enumerate(label):
+    if l in labelSet:
+        continue
+    else:
+        labelSet.add(l)
+        newData=[l]
+        newLabel=[data[index1]]
+
+        # 找到所有同类的label，并新建data和label集合，并进行写入
+        for index2,others in enumerate(label):
+            if others == l:
+                newLabel.append(l)
+                newData.append(data[index2])
+            else:
+                continue
+        X_train, X_test, Y_train, Y_test = train_test_split(newData, newLabel, test_size=0.1, random_state=47)
+
+        for x_test in X_test:
+            dataTest.write(x_test)
+        dataTest.write('\n')
+        for y_test in Y_test:
+            labelTest.write(str(y_test)+'\n')
+        labelTest.write('\n')
