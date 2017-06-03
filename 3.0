@@ -1,0 +1,76 @@
+#-*- coding:utf-8-*-
+import re
+
+# 初始化关于label的四个list
+labels = dict()
+pattern = re.compile('[a-z][a-z]+[1234]')
+train = []
+test = []
+
+
+# 输入为该条sentence和将要放入的位置
+def update(line,labelsFound,i):
+
+    for label in labelsFound:
+        labels.get(label)[0] += 1
+        labels.get(label)[i] += 1
+
+    if i == 1:
+        train.append(line)
+    else:
+        test.append(line)
+
+
+# 读
+dataSource = open('/home/hadoop/Desktop/2.txt')
+# 写
+trainText = open('/home/hadoop/Desktop/train.txt','w')
+testText  = open('/home/hadoop/Desktop/test.txt','w')
+
+for line in dataSource:
+    labelsFound = re.findall(pattern, line)
+
+    tempSums = dict()
+    for label in labelsFound:
+
+        if labels.has_key(label):
+            # 如果字典里存在该lable，就更新temp
+            tempSums[label] = labels.get(label)[0]
+        else:
+            # 不存在，先在labels中新建，再更新temp
+            labels[label] = [0,0,0]
+            tempSums[label] = 0
+
+
+    # 如果是空的一行，则跳过
+    if len(tempSums) == 0:
+        continue
+
+    # print tempSums,len(tempSums)
+
+    # 找到temp中最小的value对应的label
+    # focus = min(tempSums.items(), key=lambda x: x[1])[0]
+    focus = min(tempSums,key=tempSums.get)
+
+    # print focus
+
+    # 确定归类
+    if labels.get(focus)[1] <= labels.get(focus)[0] * 0.9:
+        i = 1
+    else:
+        i = 2
+
+    update(line, labelsFound, i)
+
+    # 写入文件
+    if i == 1:
+        trainText.write(line)
+    else:
+        testText.write(line)
+
+
+for label in labels:
+    print label, float(labels.get(label)[1])/float(labels.get(label)[0])
+
+
+print labels
